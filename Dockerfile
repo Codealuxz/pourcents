@@ -1,4 +1,4 @@
-FROM node:22-alpine AS builder
+FROM node:24.22.1-alpine AS builder
 WORKDIR /app
 
 # Front : install + patch + build
@@ -14,7 +14,8 @@ RUN npm install --omit=dev
 
 # Stage 2 : nginx + node ensemble
 FROM nginx:alpine
-RUN apk add --no-cache nodejs
+RUN apk add --no-cache libstdc++
+COPY --from=builder /usr/local/bin/node /usr/local/bin/node
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY --from=builder /app/server /app/server
 COPY nginx.conf /etc/nginx/conf.d/default.conf
